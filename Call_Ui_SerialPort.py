@@ -6,8 +6,7 @@ import re
 import sys
 import binascii
 import time
-import serial.tools.list_ports
-from PyQt5.QtCore import QTimer, QUrl
+from PyQt5.QtCore import QTimer, QDateTime
 from PyQt5.QtWidgets import *
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt5.QtWidgets import QApplication, QMainWindow
@@ -18,8 +17,33 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.StatusBarItems()
         self.CreateItems() # 设置实例
         self.CreateSignalSlot() #设置信号和槽
+
+    def StatusBarItems(self):
+        self.lenTxData = 0
+        self.lenRxData = 0
+        self.datalenLabel = QLabel()
+        self.datalenLabel.setText(f"   Tx : {self.lenTxData}   |   Rx : {self.lenRxData}")
+        self.statusBar.addPermanentWidget(self.datalenLabel,1)
+        self.emptylabel = QLabel()
+        self.statusBar.addPermanentWidget(self.emptylabel,4)
+        self.statusBarShowTime()
+
+
+    def showCurrentTime(self,timeLabel):
+        curtime = QDateTime.currentDateTime()
+        timeDisplay = curtime.toString('yyyy-MM-dd hh:mm:ss dddd')
+        timeLabel.setText(timeDisplay)
+        
+
+    def statusBarShowTime(self):
+        self.timer = QTimer()
+        self.timeLabel = QLabel()
+        self.statusBar.addPermanentWidget(self.timeLabel,1)
+        self.timer.timeout.connect(lambda: self.showCurrentTime(self.timeLabel))
+        self.timer.start(1000)
 
     def CreateItems(self):
         self.serial1 = QSerialPort() #Qt 串口类
@@ -37,6 +61,13 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.serial1.readyRead.connect(self.serial1_receive_data)
         self.checkBox_hex_send.stateChanged.connect(self.showhexsend)
         self.checkBox_hex_receive.stateChanged.connect(self.showhexreceive)
+        self.pbt_clear_receive.clicked.connect(self.pbt_clear_clicked)
+
+    def pbt_clear_clicked(self):
+        self.textEdit_Receive.clear()
+        self.lenRxData = 0
+        self.lenTxData = 0
+        self.datalenLabel.setText(f"   Tx : {self.lenTxData}   |   Rx : {self.lenRxData}")
 
     def serial1_send_data(self):
         txData = self.lineEdit_Send.text()
@@ -45,6 +76,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             return
         if self.checkBox_hex_send.isChecked() == False:
             self.serial1.write(txData.encode('UTF-8'))
+            self.lenTxData += len(txData)
         else:
             Data = txData.replace(' ','')
             if len(Data)%2 == 1:
@@ -61,6 +93,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             except:
                 QMessageBox.critical(self,'异常','十六进制发送错误')
                 return
+            self.lenTxData += len(Data)
+        self.datalenLabel.setText(f"   Tx : {self.lenTxData}   |   Rx : {self.lenRxData}")
+
     
     def serial1_receive_data(self):
         try:
@@ -70,12 +105,16 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if self.checkBox_hex_receive.isChecked() == False:
             try:
                 self.textEdit_Receive.insertPlainText(rxData.decode('UTF-8'))
+                self.lenRxData += len(rxData)
             except:
+                QMessageBox.critical(self,'接收区错误','UTF-8译码错误')
                 pass
         else:
             Data = binascii.b2a_hex(rxData).decode('ascii')
             self.textEdit_Receive.insertPlainText(Data.upper())
+            self.lenRxData += len(Data)
         self.textEdit_Receive.insertPlainText('\n')
+        self.datalenLabel.setText(f"   Tx : {self.lenTxData}   |   Rx : {self.lenRxData}")
 
 
     def pbt_refresh_1_clicked(self):
@@ -112,6 +151,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     def pbt_send_clicked(self):
         self.serial1_send_data()
+
 
     def pbt_open_1_clicked(self):
         if self.pbt_open_1.isChecked() == True:

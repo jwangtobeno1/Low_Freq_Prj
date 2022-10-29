@@ -75,6 +75,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.textEdit_Send = QtWidgets.QTextEdit(self.layoutWidget)
         self.textEdit_Send.setObjectName("textEdit_Send")
+        self.textEdit_Send.setReadOnly(True)
         self.verticalLayout.addWidget(self.textEdit_Send)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
@@ -226,12 +227,11 @@ class Ui_MainWindow(object):
         self.action.setObjectName("action")
 
         self.retranslateUi(MainWindow)
-        self.pbt_clear_receive.clicked.connect(self.textEdit_Receive.clear)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "深蓝无限 串口调试"))
         self.label_2.setText(_translate("MainWindow", "接收区："))
         self.pbt_clear_receive.setText(_translate("MainWindow", "Clear"))
         self.checkBox_hex_receive.setText(_translate("MainWindow", "hex receive"))
