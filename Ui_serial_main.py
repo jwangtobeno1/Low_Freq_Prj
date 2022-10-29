@@ -27,7 +27,7 @@ class Ui_MainWindow(object):
         self.label_7.setGeometry(QtCore.QRect(710, 10, 101, 91))
         self.label_7.setText("")
         self.label_7.setTextFormat(QtCore.Qt.AutoText)
-        self.label_7.setPixmap(QtGui.QPixmap("../../../../home/wangjie/Pictures/bsw.ico"))
+        self.label_7.setPixmap(QtGui.QPixmap("./img_logo/bsw.ico"))
         self.label_7.setScaledContents(True)
         self.label_7.setWordWrap(False)
         self.label_7.setObjectName("label_7")
