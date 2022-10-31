@@ -48,9 +48,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def CreateItems(self):
         self.serial1 = QSerialPort() #Qt 串口类
         self.serial2 = QSerialPort()
-        # self.timer = QTimer(self) #Qt 定时器类 后续可添加statusbar 时间
-        # self.timer.timeout.connect(self.ShowTime)
-        # self.timer.start(100)
 
     def CreateSignalSlot(self):
         self.pbt_open_1.clicked.connect(self.pbt_open_1_clicked)
@@ -62,9 +59,11 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.checkBox_hex_send.stateChanged.connect(self.showhexsend)
         self.checkBox_hex_receive.stateChanged.connect(self.showhexreceive)
         self.pbt_clear_receive.clicked.connect(self.pbt_clear_clicked)
+        self.serial2.readyRead.connect(self.serial2_rxtxdata)
 
     def pbt_clear_clicked(self):
         self.textEdit_Receive.clear()
+        self.textEdit_serial2.clear()
         self.lenRxData = 0
         self.lenTxData = 0
         self.datalenLabel.setText(f"   Tx : {self.lenTxData}   |   Rx : {self.lenRxData}")
@@ -78,7 +77,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             return
         if self.checkBox_hex_send.isChecked() == False:
             self.serial1.write(txData.encode('UTF-8'))
-            self.lenTxData += len(txData)
+            self.lenTxData += len(txData.encode('UTF-8'))
         else:
             Data = txData.replace(' ','')
             if len(Data)%2 == 1:
@@ -104,23 +103,45 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         timeDisplay = curtime.toString('hh:mm:ss.z')
         try:
             rxData = bytes(self.serial1.readAll())
+            '''串口数据转发 serial1 rx => serial2 tx'''
+            if self.pbt_open_2.isChecked() == True:
+                self.serial2.write(rxData)
         except:
             QMessageBox.critical(self,'错误','串口接收数据错误')
         if self.checkBox_hex_receive.isChecked() == False:
             try:
-                rxToDisplay = f"{timeDisplay:}\n{rxData.decode('UTF-8')}"
+                rxToDisplay = f"{timeDisplay}:\n{rxData.decode('UTF-8')}\n"
                 self.textEdit_Receive.insertPlainText(rxToDisplay)
+                if self.pbt_open_2.isChecked() == True:
+                    self.textEdit_serial2.insertPlainText(f"{timeDisplay}  tx :\n{rxData.decode('UTF-8')}\n")
                 self.lenRxData += len(rxData)
             except:
                 QMessageBox.critical(self,'接收区错误','UTF-8译码错误')
                 pass
         else:
             Data = binascii.b2a_hex(rxData).decode('ascii')
-            self.textEdit_Receive.insertPlainText(f"{timeDisplay:}\n{Data.upper()}")
+            self.textEdit_Receive.insertPlainText(f"{timeDisplay}:\n{Data.upper()}\n")
+            if self.pbt_open_2.isChecked() == True:
+                self.textEdit_serial2.insertPlainText(f"{timeDisplay}  tx :\n{Data.upper()}\n")
             self.lenRxData += len(Data)
-        self.textEdit_Receive.insertPlainText('\n')
         self.datalenLabel.setText(f"   Tx : {self.lenTxData}   |   Rx : {self.lenRxData}")
 
+    def serial2_rxtxdata(self):
+        curtime = QDateTime.currentDateTime()
+        timeDisplay = curtime.toString('hh:mm:ss.z')
+        try:
+            rxData = bytes(self.serial2.readAll())
+        except:
+            QMessageBox.critical(self,'错误','串口接收数据错误')
+        if self.checkBox_hex_receive.isChecked() == False:
+            try:
+                rxToDisplay = f"{timeDisplay}  rx :\n{rxData.decode('UTF-8')}\n"
+                self.textEdit_serial2.insertPlainText(rxToDisplay)
+            except:
+                QMessageBox.critical(self,'接收区错误','UTF-8译码错误')
+        else:
+            Data = binascii.b2a_hex(rxData).decode('ascii')
+            self.textEdit_serial2.insertPlainText(f"{timeDisplay}  rx :\n{Data.upper()}\n")
 
     def pbt_refresh_1_clicked(self):
         self.serial1.clear()

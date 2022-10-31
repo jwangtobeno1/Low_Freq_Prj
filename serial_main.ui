@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>899</width>
+    <width>1087</width>
     <height>555</height>
    </rect>
   </property>
@@ -26,8 +26,8 @@
    <widget class="QLabel" name="label_7">
     <property name="geometry">
      <rect>
-      <x>710</x>
-      <y>10</y>
+      <x>900</x>
+      <y>20</y>
       <width>101</width>
       <height>91</height>
      </rect>
@@ -136,11 +136,11 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>681</x>
-      <y>110</y>
+      <x>871</x>
+      <y>120</y>
       <width>181</width>
       <height>191</height>
      </rect>
@@ -295,11 +295,11 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>680</x>
-      <y>310</y>
+      <x>870</x>
+      <y>320</y>
       <width>181</width>
       <height>191</height>
      </rect>
@@ -453,6 +453,45 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QTextEdit" name="textEdit_serial2">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>80</y>
+      <width>211</width>
+      <height>431</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_10">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>20</y>
+      <width>101</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>串口数据转发：</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_15">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>50</y>
+      <width>171</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>串口1接收 =&gt; 串口2发送</string>
+    </property>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusBar">
